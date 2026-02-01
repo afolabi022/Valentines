@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fayo ❤️</title>
+  <style>
+    :root{
+      --glass: rgba(255,255,255,0.86);
+      --shadow: rgba(0,0,0,0.16);
+    }
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      display:flex;
+      min-height:100vh;
+      align-items:center;
+      justify-content:center;
+      background: radial-gradient(circle at top left, #ffd1dc, #ee9ca7 55%, #a18cd1);
+      color:#111;
+      overflow:hidden;
+    }
+
+    /* floating hearts background */
+    .heart{
+      position: fixed;
+      bottom:-40px;
+      font-size: 18px;
+      opacity: 0.25;
+      animation: floatUp linear infinite;
+      user-select: none;
+      pointer-events: none;
+      filter: blur(0.2px);
+    }
+    @keyframes floatUp{
+      from { transform: translateY(0) translateX(0) rotate(0deg); }
+      to   { transform: translateY(-120vh) translateX(40px) rotate(25deg); }
+    }
+
+    .card{
+      background: var(--glass);
+      padding: 26px 20px;
+      border-radius: 22px;
+      box-shadow: 0 14px 40px var(--shadow);
+      text-align:center;
+      width:min(460px, 92vw);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.5);
+      position: relative;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.55);
+      font-size: 13px;
+      font-weight: 650;
+      margin-bottom: 12px;
+    }
+
+    h1{ margin: 0 0 10px; font-size: 30px; }
+    .typing{
+      font-size: 16px;
+      line-height: 1.5;
+      margin: 0 0 18px;
+      opacity: 0.95;
+      min-height: 48px;
+      white-space: pre-wrap;
+    }
+
+    .btns{
+      display:flex;
+      gap:12px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-top: 4px;
+    }
+
+    button{
+      border:0;
+      padding: 12px 18px;
+      border-radius: 999px;
+      font-weight: 750;
+      cursor:pointer;
+      font-size: 16px;
+      transition: transform .1s ease, opacity .2s ease;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+    }
+    button:active{ transform: scale(0.98); }
+
+    #yesBtn{ background:#22c55e; color:white; }
+    #noBtn { background:#ef4444; color:white; }
+
+    .row{
+      display:flex;
+      justify-content: center;
+      gap:10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .tiny{
+      font-size: 13px;
+      opacity: 0.85;
+    }
+
+    .toggle{
+      background: rgba(255,255,255,0.65);
+      color:#111;
+      font-weight: 700;
+      box-shadow:none;
+      border:1px solid rgba(0,0,0,0.06);
+    }
+
+    .msg{
+      margin-top:16px;
+      font-size:16px;
+      font-weight:800;
+      min-height:24px;
+    }
+
+    /* confetti canvas */
+    canvas{
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="confetti"></canvas>
+
+  <div class="card">
+    <div class="badge">💌 Message for <span id="name">Fayo</span></div>
+    <h1 id="title">Fayo 🥺❤️</h1>
+    <div class="typing" id="typing"></div>
+
+    <div class="btns">
+      <button id="yesBtn">Yes 💘</button>
+      <button id="noBtn">No 😭</button>
+    </div>
+
+    <div class="row">
+      <button class="toggle" id="musicBtn">▶️ Play music</button>
+      <span class="tiny" id="hint">Tip: try pressing “No” 😏</span>
+    </div>
+
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <!-- Optional: put any mp3 URL here (or leave it off) -->
+  <audio id="audio" loop>
+    <source src="" type="audio/mpeg">
+  </audio>
+
+  <script>
+    // ====== FLOATING HEARTS BACKGROUND ======
+    const heartEmojis = ["❤️","💗","💖","💘","💕","💞"];
+    function spawnHeart(){
+      const h = document.createElement("div");
+      h.className = "heart";
+      h.textContent = heartEmojis[Math.floor(Math.random()*heartEmojis.length)];
+      h.style.left = Math.random()*100 + "vw";
+      h.style.animationDuration = (6 + Math.random()*8) + "s";
+      h.style.fontSize = (14 + Math.random()*18) + "px";
+      document.body.appendChild(h);
+      setTimeout(() => h.remove(), 16000);
+    }
+    setInterval(spawnHeart, 350);
+    for(let i=0;i<10;i++) spawnHeart();
+
+    // ====== TYPING EFFECT ======
+    const typingEl = document.getElementById("typing");
+    const scriptLines = [
+      "Hey Fayo…",
+      "I’ve been meaning to ask you something 😭",
+      "Will you be my Valentine? 💘"
+    ];
+    let fullText = "";
+    let line = 0, char = 0;
+
+    function type(){
+      if(line >= scriptLines.length) return;
+      const current = scriptLines[line];
+      fullText += current[char] || "";
+      typingEl.textContent = fullText;
+
+      char++;
+      const delay = 22 + Math.random()*35;
+
+      if(char > current.length){
+        fullText += "\n";
+        line++;
+        char = 0;
+        setTimeout(type, 420);
+      } else {
+        setTimeout(type, delay);
+      }
+    }
+    type();
+
+    // ====== RUNAWAY NO BUTTON ======
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn  = document.getElementById("noBtn");
+    const msg    = document.getElementById("msg");
+    const hint   = document.getElementById("hint");
+
+    let noAttempts = 0;
+
+    function moveNoButton() {
+      noAttempts++;
+
+      if(noAttempts === 2) hint.textContent = "Fayo please 😭 why are you chasing No?";
+      if(noAttempts === 4) hint.textContent = "Okay nah… you can’t press No 😂";
+
+      const pad = 12;
+      const maxX = window.innerWidth - noBtn.offsetWidth - pad;
+      const maxY = window.innerHeight - noBtn.offsetHeight - pad;
+
+      const x = Math.max(pad, Math.floor(Math.random() * maxX));
+      const y = Math.max(pad, Math.floor(Math.random() * maxY));
+
+      noBtn.style.position = "fixed";
+      noBtn.style.left = x + "px";
+      noBtn.style.top  = y + "px";
+
+      // make it slightly smaller each time (funny effect)
+      const scale = Math.max(0.65, 1 - noAttempts*0.06);
+      noBtn.style.transform = `scale(${scale})`;
+    }
+
+    noBtn.addEventListener("mouseenter", moveNoButton);
+    noBtn.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      moveNoButton();
+    }, { passive: false });
+
+    // ====== CONFETTI (simple) ======
+    const canvas = document.getElementById("confetti");
+    const ctx = canvas.getContext("2d");
+    let confetti = [];
+    function resize(){
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    function popConfetti(){
+      confetti = Array.from({length: 220}, () => ({
+        x: Math.random()*canvas.width,
+        y: -20 - Math.random()*canvas.height*0.4,
+        r: 2 + Math.random()*4,
+        vy: 2 + Math.random()*5,
+        vx: -2 + Math.random()*4,
+        rot: Math.random()*Math.PI,
+        vr: -0.12 + Math.random()*0.24
+      }));
+      animateConfetti();
+      setTimeout(() => confetti = [], 5000);
+    }
+
+    function animateConfetti(){
+      if(!confetti.length) return;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      for(const p of confetti){
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.vr;
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillRect(-p.r, -p.r, p.r*2.2, p.r*2.2);
+        ctx.restore();
+
+        // recycle
+        if(p.y > canvas.height + 20){
+          p.y = -20;
+          p.x = Math.random()*canvas.width;
+        }
+      }
+      requestAnimationFrame(animateConfetti);
+    }
+
+    // ====== YES CLICK ======
+    yesBtn.addEventListener("click", () => {
+      msg.textContent = "YAYYY 😭❤️ finally, Fayo!";
+      noBtn.style.display = "none";
+      yesBtn.textContent = "Chosen ✅";
+      yesBtn.disabled = true;
+      yesBtn.style.opacity = 0.9;
+      popConfetti();
+      hint.textContent = "Correct choice 😌💘";
+    });
+
+    // ====== MUSIC TOGGLE (optional) ======
+    const musicBtn = document.getElementById("musicBtn");
+    const audio = document.getElementById("audio");
+    let playing = false;
+
+    musicBtn.addEventListener("click", async () => {
+      if(!audio.querySelector("source").src){
+        alert("No music set yet. If you want music, tell me and I’ll add a song link.");
+        return;
+      }
+      try{
+        if(!playing){
+          await audio.play();
+          playing = true;
+          musicBtn.textContent = "⏸️ Pause music";
+        }else{
+          audio.pause();
+          playing = false;
+          musicBtn.textContent = "▶️ Play music";
+        }
+      }catch(e){
+        alert("Tap again — your browser blocked autoplay.");
+      }
+    });
+  </script>
+</body>
+</html>
