@@ -153,9 +153,10 @@
   </div>
 
   <!-- Optional: put any mp3 URL here (or leave it off) -->
-  <audio id="audio" loop>
-    <source src="" type="audio/mpeg">
-  </audio>
+  <audio id="audio" preload="auto" loop playsinline>
+  <source src="/assets/song.mp3" type="audio/mpeg">
+</audio>
+
 
   <script>
     // ====== FLOATING HEARTS BACKGROUND ======
@@ -261,7 +262,7 @@
         vr: -0.12 + Math.random()*0.24
       }));
       animateConfetti();
-      setTimeout(() => confetti = [], 5000);
+      setTimeout(() => confetti = [], 10000);
     }
 
     function animateConfetti(){
@@ -302,26 +303,24 @@
     const musicBtn = document.getElementById("musicBtn");
     const audio = document.getElementById("audio");
     let playing = false;
+musicBtn.addEventListener("click", async () => {
+  try {
+    audio.load(); // helps Safari/iPhone
+    if (!playing) {
+      await audio.play();
+      playing = true;
+      musicBtn.textContent = "⏸️ Pause music";
+    } else {
+      audio.pause();
+      playing = false;
+      musicBtn.textContent = "▶️ Play music";
+    }
+  } catch (e) {
+    alert("Tap again — Safari sometimes blocks the first play.");
+  }
+});
 
-    musicBtn.addEventListener("click", async () => {
-      if(!audio.querySelector("source").src){
-        alert("No music set yet. If you want music, tell me and I’ll add a song link.");
-        return;
-      }
-      try{
-        if(!playing){
-          await audio.play();
-          playing = true;
-          musicBtn.textContent = "⏸️ Pause music";
-        }else{
-          audio.pause();
-          playing = false;
-          musicBtn.textContent = "▶️ Play music";
-        }
-      }catch(e){
-        alert("Tap again — your browser blocked autoplay.");
-      }
-    });
   </script>
 </body>
 </html>
+
